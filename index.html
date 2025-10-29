@@ -18,7 +18,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         
@@ -142,6 +142,11 @@
             display: inline-block;
         }
         
+        .username-code {
+            color: #66b3ff;
+            border-color: rgba(102, 179, 255, 0.3);
+        }
+        
         .index-cell {
             color: #ff3333;
             font-weight: bold;
@@ -198,10 +203,11 @@
         fetch('data/passwords.json')
             .then(r => r.json())
             .then(data => {
-                let html = '<div class="table-wrapper"><table><thead><tr><th>#</th><th>Password</th><th>Reason</th><th>Generated</th></tr></thead><tbody>';
+                let html = '<div class="table-wrapper"><table><thead><tr><th>#</th><th>Username</th><th>Password</th><th>Reason</th><th>Generated</th></tr></thead><tbody>';
                 data.forEach((item, index) => {
                     html += `<tr>
                         <td class="index-cell">${index + 1}</td>
+                        <td><code class="username-code">${item.username || 'N/A'}</code></td>
                         <td><code>${item.password}</code></td>
                         <td class="reason-cell">${item.reason || 'N/A'}</td>
                         <td class="date-cell">${new Date(item.generated_at).toLocaleString()}</td>
