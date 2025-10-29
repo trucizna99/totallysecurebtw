@@ -1,36 +1,217 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Password Viewer</title>
+    <title>Password Vault</title>
     <style>
-        body { font-family: Arial; max-width: 1000px; margin: 50px auto; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
-        th { background: #333; color: white; }
-        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: #ff3333;
+            text-shadow: 0 0 20px rgba(255, 51, 51, 0.5),
+                         0 0 40px rgba(255, 51, 51, 0.3);
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        #content {
+            background: rgba(20, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8),
+                        0 0 100px rgba(255, 51, 51, 0.1) inset;
+            border: 1px solid rgba(255, 51, 51, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .table-wrapper::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+        
+        .table-wrapper::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+        }
+        
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #ff3333, #8b0000);
+            border-radius: 10px;
+            border: 2px solid rgba(0, 0, 0, 0.4);
+        }
+        
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #ff4444, #a00000);
+        }
+        
+        table { 
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        th, td { 
+            padding: 15px 20px;
+            text-align: left;
+        }
+        
+        th { 
+            background: linear-gradient(135deg, #8b0000 0%, #4d0000 100%);
+            color: #fff;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        th:first-child {
+            border-top-left-radius: 10px;
+        }
+        
+        th:last-child {
+            border-top-right-radius: 10px;
+        }
+        
+        tr {
+            transition: all 0.3s ease;
+        }
+        
+        tbody tr {
+            background: rgba(30, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(255, 51, 51, 0.1);
+        }
+        
+        tbody tr:hover {
+            background: rgba(139, 0, 0, 0.3);
+            transform: scale(1.01);
+            box-shadow: 0 5px 20px rgba(255, 51, 51, 0.2);
+        }
+        
+        tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 10px;
+        }
+        
+        tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 10px;
+        }
+        
+        code { 
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 12px;
+            border-radius: 5px;
+            color: #ff6666;
+            font-family: 'Courier New', monospace;
+            font-size: 1.05em;
+            border: 1px solid rgba(255, 51, 51, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            display: inline-block;
+        }
+        
+        .index-cell {
+            color: #ff3333;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .reason-cell {
+            color: #ccc;
+            font-style: italic;
+        }
+        
+        .date-cell {
+            color: #aaa;
+            font-size: 0.95em;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.3em;
+            color: #ff3333;
+            text-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+        }
+        
+        .error {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.2em;
+            color: #ff6666;
+            background: rgba(139, 0, 0, 0.2);
+            border-radius: 10px;
+            border: 2px solid rgba(255, 51, 51, 0.3);
+        }
+        
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(255, 51, 51, 0.5); }
+            50% { text-shadow: 0 0 30px rgba(255, 51, 51, 0.8); }
+        }
+        
+        h1 {
+            animation: glow 3s ease-in-out infinite;
+        }
     </style>
 </head>
 <body>
-    <h1>Generated Passwords</h1>
-    <div id="content">Loading...</div>
+    <div class="container">
+        <h1>🔒 PASSWORD VAULT</h1>
+        <p class="subtitle">Secure Password Repository</p>
+        <div id="content">
+            <div class="loading">Loading passwords...</div>
+        </div>
+    </div>
     <script>
         fetch('data/passwords.json')
             .then(r => r.json())
             .then(data => {
-                let html = '<table><tr><th>#</th><th>Password</th><th>Reason</th><th>Generated</th></tr>';
+                let html = '<div class="table-wrapper"><table><thead><tr><th>#</th><th>Password</th><th>Reason</th><th>Generated</th></tr></thead><tbody>';
                 data.forEach((item, index) => {
                     html += `<tr>
-                        <td>${index + 1}</td>
+                        <td class="index-cell">${index + 1}</td>
                         <td><code>${item.password}</code></td>
-                        <td>${item.reason || 'N/A'}</td>
-                        <td>${new Date(item.generated_at).toLocaleString()}</td>
+                        <td class="reason-cell">${item.reason || 'N/A'}</td>
+                        <td class="date-cell">${new Date(item.generated_at).toLocaleString()}</td>
                     </tr>`;
                 });
-                html += '</table>';
+                html += '</tbody></table></div>';
                 document.getElementById('content').innerHTML = html;
             })
             .catch(e => {
-                document.getElementById('content').innerHTML = 'Error loading data: ' + e;
+                document.getElementById('content').innerHTML = '<div class="error">⚠️ Error loading passwords: ' + e.message + '</div>';
             });
     </script>
 </body>
